@@ -32,12 +32,7 @@ app.use("/api/products", productRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/admin", adminRoute);
 
-// Health check (optional)
-app.get("/", (req, res) => {
-  res.json({ message: "API is running!" });
-});
 
-// ✅ ONLY listen locally - NOT on Vercel
 if (process.env.NODE_ENV !== 'production') {
   const PORT = 5000;
   app.listen(PORT, () => {
@@ -45,5 +40,5 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
-// ✅ Export for Vercel
+
 module.exports = app;
