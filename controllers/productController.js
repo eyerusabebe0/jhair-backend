@@ -10,13 +10,26 @@ exports.getProducts = async (req, res) => {
   }
 };
 
-// CREATE product
+// CREATE product - Allow both owner AND admin
 exports.createProduct = async (req, res) => {
   try {
-    const product = new Product(req.body);
+    // Allow if user is owner OR admin
+    if (req.user.role !== "owner" && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Only owners and admins can add products" });
+    }
+
+    const product = new Product({
+      name: req.body.name,
+      price: req.body.price,
+      description: req.body.description,
+      image: req.body.image
+    });
+
     await product.save();
-    res.json(product);
+    res.status(201).json(product);
+
   } catch (error) {
+    console.error("Error creating product:", error);
     res.status(500).json({ message: error.message });
   }
 };

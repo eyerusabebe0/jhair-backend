@@ -26,11 +26,12 @@ const jwt=require("jsonwebtoken");
     res.json({
       message: "Login successful",
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
+     user: {
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role
+},
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -42,7 +43,7 @@ const registerUser = async (req, res) => {
   try {
     console.log("📥 Received registration request:", req.body); // ✅ Add this
     
-    const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
     
     console.log("Extracted:", { name, email, password }); // ✅ Add this
 
@@ -61,6 +62,7 @@ const registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+       role: role || "user"
     });
     
     console.log("✅ User created successfully:", user); // ✅ Add this
@@ -74,10 +76,11 @@ const registerUser = async (req, res) => {
       message: "User registered successfully",
       token,
       user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role  
+}
     });
 
   } catch (error) {
@@ -170,25 +173,28 @@ const saveItem = async (req, res) => {
   }
 };
 
-// ================= GET SAVED ITEMS =================
 const getSavedItems = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).populate('savedItems.productId');
     
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
     const savedProducts = user.savedItems
-      .filter(item => item.productId) // Filter out null products
+      .filter(item => item.productId) // Filter out any null products
       .map(item => ({
         _id: item.productId._id,
         name: item.productId.name,
         price: item.productId.price,
         description: item.productId.description,
         image: item.productId.image,
-        category: item.productId.category,
         savedAt: item.addedAt
       }));
     
     res.json(savedProducts);
   } catch (error) {
+    console.error("Error getting saved items:", error);
     res.status(500).json({ message: error.message });
   }
 };
