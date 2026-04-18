@@ -8,12 +8,19 @@ const adminRoute = require("./routes/adminRoute");
 
 const app = express();
 app.use(express.json());
-app.use(cors({
-  origin: 'https://jhair-frontend-4kne.vercel.app',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://jhair-frontend-4kne.vercel.app"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
+app.options("*", cors());
 
 connectDB();
 
